@@ -2,7 +2,6 @@ import User from '../models/User.js';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
-
 export const sendMail = async (req, res) => {
   const { subject, message, recipients, userId, fromEmail } = req.body;
 
@@ -22,6 +21,18 @@ export const sendMail = async (req, res) => {
       });
     }
 
+    user.invoiceCount += 1;
+    const invoiceNumber = `INV${String(user.invoiceCount).padStart(5, '0')}`;
+    await user.save();
+
+    const fullMessage = `
+${message}
+
+--------------------------------
+Invoice Number: ${invoiceNumber}
+From: ${fromEmail}
+    `;
+
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
@@ -36,15 +47,16 @@ export const sendMail = async (req, res) => {
       from: `<${process.env.SMTP_USER}>`,
       bcc: recipients.join(','),
       subject,
-      text: message,
+      text: fullMessage,
       replyTo: fromEmail
     };
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({ success: true, message: 'Emails sent successfully' });
+    res.status(200).json({ success: true, message: 'Emails sent successfully', invoiceNumber });
   } catch (error) {
     console.error('Mail error:', error);
     res.status(500).json({ error: 'Failed to send emails' });
   }
 };
+

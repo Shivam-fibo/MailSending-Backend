@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+invoiceCount: {
+  type: Number,
+  default: 0,
+},
+
   emailOTPExpires: {
     type: Date,
     default: null
