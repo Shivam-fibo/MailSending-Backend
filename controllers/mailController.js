@@ -28,7 +28,7 @@ export const sendMail = async (req, res) => {
     await user.save();
 
     // Construct subject
-    const subject = `New invoice ${invoiceNumber} from ${user.name}`;
+    const subject = `New invoice ${invoiceNumber}`;
 
     // Include amount in email body
     const fullMessage = `
