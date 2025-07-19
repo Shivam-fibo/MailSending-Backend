@@ -2,8 +2,9 @@ import User from '../models/User.js';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
+
 export const sendMail = async (req, res) => {
-  const { subject, message, recipients, userId, fromEmail } = req.body;
+  const { message, recipients, userId, fromEmail, amount } = req.body;
 
   if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
     return res.status(400).json({ error: 'Recipients array is required' });
@@ -15,22 +16,28 @@ export const sendMail = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (!user.isUpgrade && recipients.length > 2) {
+    if (!user.isUpgrade && recipients.length > 25) {
       return res.status(400).json({
         error: 'User is not verified. Please verify your email to send more than 2 messages in bulk.',
       });
     }
 
+    // Generate invoice number
     user.invoiceCount += 1;
     const invoiceNumber = `INV${String(user.invoiceCount).padStart(5, '0')}`;
     await user.save();
 
+    // Construct subject
+    const subject = `New invoice ${invoiceNumber} from ${user.name}`;
+
+    // Include amount in email body
     const fullMessage = `
 ${message}
 
 --------------------------------
 Invoice Number: ${invoiceNumber}
 From: ${fromEmail}
+Amount: $${amount}
     `;
 
     const transporter = nodemailer.createTransport({
@@ -53,10 +60,14 @@ From: ${fromEmail}
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({ success: true, message: 'Emails sent successfully', invoiceNumber });
+    res.status(200).json({
+      success: true,
+      message: 'Emails sent successfully',
+      invoiceNumber,
+      amount
+    });
   } catch (error) {
     console.error('Mail error:', error);
     res.status(500).json({ error: 'Failed to send emails' });
   }
 };
-
