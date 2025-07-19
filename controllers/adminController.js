@@ -11,32 +11,26 @@ export const AllUser = async (req, res) => {
   }
 };
 
-
 export const UpdateUser = async (req, res) => {
-  // console.log("req is", req.body)
-  console.log("hello")
   try {
     const { userId } = req.body;
 
-    const user = await User.findById(userId); 
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
 
-    if (user.isUpgrade) {
-      return res.status(400).json({ error: "User is already upgraded" });
-    }
-    // console.log(user.isUpgrade)
-    user.isUpgrade = true;
-    await user.save(); 
-    // console.log(user.isUpgrade)
+    // Toggle the isUpgrade field
+    user.isUpgrade = !user.isUpgrade;
+    await user.save();
 
     res.status(200).json({
-      message: "User upgraded successfully",
+      message: `User upgrade status changed to ${user.isUpgrade}`,
+      isUpgrade: user.isUpgrade,
     });
   } catch (error) {
-    console.error(error); 
+    console.error(error);
     res.status(500).json({ error: "Something went wrong" });
   }
 };

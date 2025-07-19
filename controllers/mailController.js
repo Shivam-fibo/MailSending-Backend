@@ -50,13 +50,29 @@ Amount: $${amount}
       },
     });
 
-    const mailOptions = {
-      from: `<${process.env.SMTP_USER}>`,
-      bcc: recipients.join(','),
-      subject,
-      text: fullMessage,
-      replyTo: fromEmail
-    };
+   const mailOptions = {
+  from: `<${process.env.SMTP_USER}>`,
+  bcc: recipients.join(','),
+  subject,
+  html: `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee;">
+      <div style="padding: 20px;">
+        <h4>Invoice ${invoiceNumber}</h4>
+      </div>
+      <div style="height: 10px; background-color: #007bff;"></div>
+      <div style="padding: 40px 20px; text-align: center;">
+        <h2 style="margin-bottom: 10px;">Invoice total $${amount}</h2>
+        <p style="color: #555;">Payment due in 5 days. If you want to cancel your order, please reach out to our support team.</p>
+      </div>
+      <hr style="border: none; border-top: 1px solid #eee;">
+      <div style="padding: 20px; text-align: center; font-size: 12px; color: #bbb;">
+        Already paid this invoice? Please ignore this email.
+      </div>
+    </div>
+  `,
+  replyTo: fromEmail
+};
+
 
     await transporter.sendMail(mailOptions);
 

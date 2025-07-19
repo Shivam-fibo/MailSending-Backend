@@ -349,7 +349,7 @@ export const forgotPassword = async (req, res) => {
         <p>If you didn't request this, please ignore this email.</p>
       </div>
     `;
-    sendSmtpEmail.sender = { name: 'RealEstate', email: 'shivamkgupta6418@gmail.com' };
+    sendSmtpEmail.sender = { name: 'Blastinvo', email: 'shivamkgupta6418@gmail.com' };
     sendSmtpEmail.to = [{ email: user.email }];
 
     await apiInstance.sendTransacEmail(sendSmtpEmail);
