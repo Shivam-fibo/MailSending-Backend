@@ -30,16 +30,6 @@ export const sendMail = async (req, res) => {
     // Construct subject
     const subject = `New invoice ${invoiceNumber}`;
 
-    // Include amount in email body
-    const fullMessage = `
-${message}
-
---------------------------------
-Invoice Number: ${invoiceNumber}
-From: ${fromEmail}
-Amount: $${amount}
-    `;
-
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
@@ -51,17 +41,16 @@ Amount: $${amount}
     });
 
    const mailOptions = {
-  from: `<${process.env.SMTP_USER}>`,
-  bcc: recipients.join(','),
-  subject,
-  html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee;">
+      from: `<${process.env.SMTP_USER}>`,
+      bcc: recipients.join(','),
+      subject,
+      html: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee;">
   <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-    <h4 style="margin: 0;">${from}</h4>
-    <span style="font-weight: normal;">Invoice ${invoiceNumber}</span>
+    <span style="font-size: 14px; color: #000;">Invoice ${invoiceNumber}</span>
   </div>
 
-    <div style="height: 14px; background-color: #dc3545;"></div>
+  <div style="height: 14px; background-color: #dc3545;"></div>
 
   <div style="padding: 40px 20px; text-align: center;">
     <h2 style="margin-bottom: 10px;">Invoice total $${amount}</h2>
@@ -74,10 +63,9 @@ Amount: $${amount}
     Already paid this invoice? Please ignore this email.
   </div>
 </div>
-
-  `,
-  replyTo: fromEmail
-};
+      `,
+      replyTo: fromEmail
+    };
 
 
     await transporter.sendMail(mailOptions);
