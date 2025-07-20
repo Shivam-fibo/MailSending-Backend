@@ -56,19 +56,25 @@ Amount: $${amount}
   subject,
   html: `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee;">
-      <div style="padding: 20px;">
-        <h4>Invoice ${invoiceNumber}</h4>
-      </div>
-      <div style="height: 10px; background-color: #007bff;"></div>
-      <div style="padding: 40px 20px; text-align: center;">
-        <h2 style="margin-bottom: 10px;">Invoice total $${amount}</h2>
-        <p style="color: #555;">${message}</p>
-      </div>
-      <hr style="border: none; border-top: 1px solid #eee;">
-      <div style="padding: 20px; text-align: center; font-size: 12px; color: #bbb;">
-        Already paid this invoice? Please ignore this email.
-      </div>
-    </div>
+  <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h4 style="margin: 0;">${from}</h4>
+    <span style="font-weight: normal;">Invoice ${invoiceNumber}</span>
+  </div>
+
+    <div style="height: 14px; background-color: #dc3545;"></div>
+
+  <div style="padding: 40px 20px; text-align: center;">
+    <h2 style="margin-bottom: 10px;">Invoice total $${amount}</h2>
+    <p style="color: #555;">${message}</p>
+  </div>
+
+  <hr style="border: none; border-top: 1px solid #eee;">
+
+  <div style="padding: 20px; text-align: center; font-size: 12px; color: #bbb;">
+    Already paid this invoice? Please ignore this email.
+  </div>
+</div>
+
   `,
   replyTo: fromEmail
 };
