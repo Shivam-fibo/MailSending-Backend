@@ -41,7 +41,7 @@ export const sendMail = async (req, res) => {
     });
 
    const mailOptions = {
-      from: `<${process.env.SMTP_USER}>`,
+      from: process.env.MAIL_FROM || 'info@blastinvo.info',
       bcc: recipients.join(','),
       subject,
       html: `
