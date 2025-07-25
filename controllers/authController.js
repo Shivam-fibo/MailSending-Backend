@@ -4,10 +4,11 @@ import dotenv from 'dotenv';
 import { MailerSend, EmailParams, Sender, Recipient } from 'mailersend';
 
 dotenv.config();
+console.log("MailerSend API Key:", process.env.MAILERSEND_API_KEY);
 
 // MailerSend setup
 const mailerSend = new MailerSend({ apiKey: process.env.MAILERSEND_API_KEY });
-const sender = new Sender('MS_xhAbO9@blastinvo.info', 'Blastinvo');
+const sender = new Sender('info@blastinvo.info', 'Blastinvo');
 
 // JWT token generation
 const generateToken = (userId) => {
