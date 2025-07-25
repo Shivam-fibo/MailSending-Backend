@@ -14,7 +14,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://mail-sending-seven.vercel.app','https://mail-sending-admin.vercel.app' ],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://mail-sending-seven.vercel.app','https://mail-sending-admin.vercel.app', 'https://blastinvo.info' ],
   credentials: true
 }));
 app.use(express.json());
