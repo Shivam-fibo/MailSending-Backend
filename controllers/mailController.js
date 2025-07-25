@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 export const sendMail = async (req, res) => {
@@ -30,7 +31,7 @@ export const sendMail = async (req, res) => {
     // Construct subject
     const subject = `New invoice ${invoiceNumber}`;
 
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransporter({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
       secure: false,
@@ -40,42 +41,82 @@ export const sendMail = async (req, res) => {
       },
     });
 
-   const mailOptions = {
-      from: process.env.MAIL_FROM || 'info@blastinvo.info',
-      bcc: recipients.join(','),
-      subject,
-      html: `
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee;">
-  <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-    <span style="font-size: 14px; color: #000;">Invoice ${invoiceNumber}</span>
-  </div>
+    // Email template
+    const emailTemplate = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee;">
+        <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 14px; color: #000;">Invoice ${invoiceNumber}</span>
+        </div>
 
-  <div style="height: 14px; background-color: #dc3545;"></div>
+        <div style="height: 14px; background-color: #dc3545;"></div>
 
-  <div style="padding: 40px 20px; text-align: center;">
-    <h2 style="margin-bottom: 10px;">Invoice total $${amount}</h2>
-    <p style="color: #555;">${message}</p>
-  </div>
+        <div style="padding: 40px 20px; text-align: center;">
+          <h2 style="margin-bottom: 10px;">Invoice total $${amount}</h2>
+          <p style="color: #555;">${message}</p>
+        </div>
 
-  <hr style="border: none; border-top: 1px solid #eee;">
+        <hr style="border: none; border-top: 1px solid #eee;">
 
-  <div style="padding: 20px; text-align: center; font-size: 12px; color: #bbb;">
-    Already paid this invoice? Please ignore this email.
-  </div>
-</div>
-      `,
-      replyTo: fromEmail
-    };
+        <div style="padding: 20px; text-align: center; font-size: 12px; color: #bbb;">
+          Already paid this invoice? Please ignore this email.
+        </div>
+      </div>
+    `;
 
+    // Send individual emails to each recipient
+    const emailPromises = recipients.map(async (recipient) => {
+      const mailOptions = {
+        from: process.env.MAIL_FROM || 'info@blastinvo.info',
+        to: recipient, // Send to individual recipient
+        subject,
+        html: emailTemplate,
+        replyTo: fromEmail
+      };
 
-    await transporter.sendMail(mailOptions);
+      try {
+        await transporter.sendMail(mailOptions);
+        return { email: recipient, status: 'sent' };
+      } catch (error) {
+        console.error(`Failed to send email to ${recipient}:`, error);
+        return { email: recipient, status: 'failed', error: error.message };
+      }
+    });
+
+    // Wait for all emails to be processed
+    const results = await Promise.allSettled(emailPromises);
+    
+    // Count successful and failed sends
+    const successful = results.filter(result => 
+      result.status === 'fulfilled' && result.value.status === 'sent'
+    ).length;
+    
+    const failed = results.filter(result => 
+      result.status === 'rejected' || 
+      (result.status === 'fulfilled' && result.value.status === 'failed')
+    ).length;
+
+    // Log detailed results for debugging
+    const detailedResults = results.map(result => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      } else {
+        return { status: 'failed', error: result.reason };
+      }
+    });
+
+    console.log('Email sending results:', detailedResults);
 
     res.status(200).json({
       success: true,
-      message: 'Emails sent successfully',
+      message: `Emails processed: ${successful} sent, ${failed} failed`,
       invoiceNumber,
-      amount
+      amount,
+      totalRecipients: recipients.length,
+      successfulSends: successful,
+      failedSends: failed,
+      details: detailedResults
     });
+
   } catch (error) {
     console.error('Mail error:', error);
     res.status(500).json({ error: 'Failed to send emails' });
