@@ -31,7 +31,7 @@ export const sendMail = async (req, res) => {
     // Construct subject
     const subject = `New invoice ${invoiceNumber}`;
 
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
       secure: false,
