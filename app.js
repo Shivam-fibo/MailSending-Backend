@@ -21,10 +21,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser())
 
-app.use('/api/mail', mailRoutes);
-app.use('/api/auth', authRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/user', userRoutes)
+app.use('/api/v1/mail', mailRoutes);
+app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/admin', adminRoutes)
+app.use('/api/v1/user', userRoutes)
 
 app.get('/', (req, res) =>{
     res.status(201).send("hello world")
