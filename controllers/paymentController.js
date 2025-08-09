@@ -1,10 +1,10 @@
 import razorpayInstance from "../config/razorpay.js";
 import crypto from "crypto";
-
+import User from "../models/User.js";
 export const createOrder = async (req, res) => {
   try {
-    const { amount, currency } = req.body;
-
+    const { amount, currency,userEmail } = req.body;
+    console.log(req.body)
     const options = {
       amount: amount * 100, 
       currency: currency || "INR",
@@ -16,6 +16,7 @@ export const createOrder = async (req, res) => {
       success: true,
       order,
     });
+    console.log(order)
   } catch (error) {
     console.error("Create Order Error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -34,6 +35,7 @@ export const verifyPayment = (req, res) => {
       .digest("hex");
 
     if (expectedSign === razorpay_signature) {
+
       res.status(200).json({ success: true, message: "Payment verified successfully" });
     } else {
       res.status(400).json({ success: false, message: "Invalid signature" });

@@ -14,7 +14,7 @@ export const getSingleUser = async (req, res) => {
 };
 
 export const getUserEmail = async(req, res) =>{
-    console.log(req.params.id)
+    // console.log(req.params.id)
     const {id} = req.params.id
    
     try {
