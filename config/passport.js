@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../models/User.js";
 
+
 passport.use(
   new GoogleStrategy(
     {
@@ -11,14 +12,28 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        // 1️⃣ Try finding by googleId
         let user = await User.findOne({ googleId: profile.id });
+
         if (!user) {
-          user = await User.create({
-            googleId: profile.id,
-            name: profile.displayName,
-            email: profile.emails[0].value,
-          });
+          // 2️⃣ Try finding by email if googleId not found
+          user = await User.findOne({ email: profile.emails[0].value });
+
+          if (user) {
+            // Link existing account with Google
+            user.googleId = profile.id;
+            await user.save();
+          } else {
+            // 3️⃣ Create a brand new user
+            user = await User.create({
+              googleId: profile.id,
+              name: profile.displayName,
+              email: profile.emails[0].value,
+              isVerified: true,
+            });
+          }
         }
+
         done(null, user);
       } catch (err) {
         done(err, null);

@@ -165,6 +165,8 @@ export const forgotPassword = async (req, res) => {
     const otp = generateOTP();
     user.resetPasswordToken = otp;
     user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+
+    console.log(email, otp)
     await user.save();
 
     await sendEmail({
@@ -214,6 +216,7 @@ export const resetPassword = async (req, res) => {
     if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
 
     user.password = newPassword;
+    user.isVerified = true
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();

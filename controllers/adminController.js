@@ -3,7 +3,6 @@ import Mail from "../models/Mail.js";
 export const AllUser = async (req, res) => {
   try {
     const users = await User.find().select('_id email isUpgrade');
-    console.log(users);
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
@@ -46,7 +45,6 @@ export const GetAllMail =  async(req, res) =>{
   try {
     const allMail = await Mail.find()
     const userId = allMail.map(mail => mail.userId);
-    console.log(userId)
     return res.status(200).json({allMail, userId})
   } catch (error) {
     console.log(error)
