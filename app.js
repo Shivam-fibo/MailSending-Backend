@@ -12,12 +12,15 @@ import adminAuthRoutes from './routes/adminAuthRoutes.js';
 import cookieParser from 'cookie-parser';
 import passport from "passport";
 import session from "express-session";
+import crypto from 'crypto';
 
 import "./config/passport.js"
 dotenv.config();
 connectDB();
 
 const app = express();
+
+
 
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174', 'https://mail-sending-seven.vercel.app','https://mail-sending-admin.vercel.app' ],
