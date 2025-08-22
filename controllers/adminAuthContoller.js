@@ -123,6 +123,7 @@ export const checkAuth = async (req, res) => {
     if (!admin) return res.status(401).json({ success: false, message: "Not authorized" });
     return res.status(200).json({ success: true, admin: { email: admin.email } });
   } catch (err) {
+    console.error("checkAuth error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
