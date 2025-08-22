@@ -116,3 +116,13 @@ export const logout = (req, res) => {
   });
   return res.json({ success: true, message: "Logged out successfully" });
 };
+
+export const checkAuth = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.adminId);
+    if (!admin) return res.status(401).json({ success: false, message: "Not authorized" });
+    return res.status(200).json({ success: true, admin: { email: admin.email } });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
