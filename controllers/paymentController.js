@@ -3,7 +3,7 @@ import crypto from "crypto";
 import User from "../models/User.js";
 export const createOrder = async (req, res) => {
   try {
-    const { amount, currency,userEmail } = req.body;
+    const { amount, currency, userEmail } = req.body;
     console.log(req.body)
     const options = {
       amount: amount * 100, 
@@ -24,7 +24,7 @@ export const createOrder = async (req, res) => {
 };
 
 // Verify Payment Signature
-export const verifyPayment = (req, res) => {
+export const verifyPayment = async(req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
@@ -35,6 +35,8 @@ export const verifyPayment = (req, res) => {
       .digest("hex");
 
     if (expectedSign === razorpay_signature) {
+      // Update user's isUpgrade status to true
+      await User.findByIdAndUpdate(req.user.userId, { isUpgrade: true });
 
       res.status(200).json({ success: true, message: "Payment verified successfully" });
     } else {
