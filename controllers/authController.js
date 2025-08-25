@@ -98,7 +98,7 @@ export const login = async (req, res) => {
     res.json({
       success: true,
       message: 'Login successful',
-      user: { id: user._id, email: user.email, name: user.name }
+      user: { id: user._id, email: user.email, name: user.name, isUpgrade: user.isUpgrade }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
@@ -147,6 +147,9 @@ export const resendOTP = async (req, res) => {
 export const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
     res.json({ success: true, user });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
